@@ -19,13 +19,13 @@ import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
 
 @RestController
-@RequestMapping("/api/transcribes")
+@RequestMapping("/api/changes")
 public class TransController {
 
     @Value("${spring.cloud.gcp.speech.credentials.location}")
     private String credentialsPath;
 
-    @PostMapping("/speech-to-text")
+    @PostMapping("/STT")
     public String transcribeAudio(@RequestParam("file") MultipartFile file) {
         try {
             SpeechSettings settings = SpeechSettings.newBuilder()
@@ -57,6 +57,38 @@ public class TransController {
             return transcript.toString();
         } catch (IOException e) {
             throw new RuntimeException(e);
+        }
+    }
+
+    @PostMapping("/OCR")
+    public String detectTextFromImage(@RequestParam("file") MultipartFile file) {
+        try {
+            GoogleCredentials credentials = GoogleCredentials.fromStream(Files.newInputStream(Paths.get(credentialsPath)));
+
+            ImageAnnotatorSettings settings = ImageAnnotatorSettings.newBuilder()
+                    .setCredentialsProvider(FixedCredentialsProvider.create(credentials))
+                    .build();
+            ImageAnnotatorClient vision = ImageAnnotatorClient.create(settings);
+
+            ByteString imgBytes = ByteString.copyFrom(file.getBytes());
+            Image img = Image.newBuilder().setContent(imgBytes).build();
+
+            Feature feature = Feature.newBuilder().setType(Feature.Type.TEXT_DETECTION).build();
+            AnnotateImageRequest request = AnnotateImageRequest.newBuilder()
+                    .addFeatures(feature)
+                    .setImage(img)
+                    .build();
+
+            AnnotateImageResponse response = vision.batchAnnotateImages(Collections.singletonList(request)).getResponsesList().get(0);
+
+            StringBuilder result = new StringBuilder();
+            response.getTextAnnotationsList().forEach(annotation -> result.append(annotation.getDescription()).append("\n"));
+
+            return result.toString();
+
+        } catch (IOException e) {
+            e.printStackTrace();
+            return "Error occurred while processing the image.";
         }
     }
 }
