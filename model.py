@@ -343,6 +343,38 @@ def convert_audio_to_text(audio_data):
     response = speech_client.recognize(config=config, audio=audio)
     return response.results[0].alternatives[0].transcript if response.results else ""
 
+@app.route('/image', methods=['POST'])
+def process_image():
+    data = request.get_json()
+
+    if 'image_key' not in data:
+        return jsonify({"error": "No image key provided"}), 400
+
+    image_key = data['image_key']
+
+    client = ai(api_key=openai_api_key)
+
+    response = client.chat.completions.create(
+        model="gpt-4o-mini",
+        messages=[
+            {
+                "role": "user",
+                "content": [
+                    {"type": "text", "text": "이미지 안에 보이는 사람의 인상착의를 설명해줘. 옷의 종류나 색감을 요약해서 한줄로."},
+                    {
+                        "type": "image_url",
+                        "image_url": {
+                            "url": "..." + image_key,
+                        },
+                    },
+                ],
+            }
+        ],
+        max_tokens=300,
+    )
+    print(response.choices[0].message.content)
+    return jsonify({"description": response.choices[0].message.content})
+
 if __name__ == '__main__':
     logging.info("Starting the server...")
     eventlet.wsgi.server(eventlet.listen(('0.0.0.0', 5000)), app)
