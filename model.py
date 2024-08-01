@@ -37,7 +37,7 @@ speech_client = speech.SpeechClient(credentials=credentials)
 openai_api_key = '...'
 llm = OpenAI(api_key=openai_api_key, temperature=0.7)
 
-# 프롬프트 템플릿
+# 메인 프롬프트
 main_prompt = PromptTemplate.from_template(
     """
     당신은 노년층을 위한 택시 앱의 대화 에이전트입니다. 다음과 같은 대화를 진행하세요:
@@ -59,7 +59,7 @@ main_chain = (
     | StrOutputParser()
 )
 
-# 텍스트 보정 및 목적지 추출을 위한 프롬프트 템플릿
+# 목적지 보정 프롬프트
 correction_prompt = PromptTemplate.from_template(
     """
     다음 텍스트는 택시 앱에서 사용자가 말한 목적지입니다.
@@ -68,18 +68,38 @@ correction_prompt = PromptTemplate.from_template(
     1. 문맥 확인: 목적지와 관련이 없거나 의미가 불분명한 부분, 맥락이 어색한 부분이 있다면 수정해 주세요.
     2. 발음 교정: 발음이 어눌하거나, 맥락에 맞지 않게 센 발음이거나, 잘못된 부분이 있다면 올바르게 수정해 주세요.
     3. 목적지 단어 추출: 목적지에 해당하는 단어만 추출해 주세요. 예를 들어, "서울역에 가고 싶어"에서는 "서울역"만 추출합니다.
-    4. 체인점 지점 확인: 만약 목적지가 체인점(예: 스타벅스, 맥도날드 등)이고 지점을 언급했다면, 체인점 이름과 지점 정보를 모두 포함해 주세요. 예를 들어, "강남역 근처 스타벅스"는 "스타벅스 강남역점"으로 응답해 주세요.
+    4. 체인점 지점 확인: 만약 목적지가 체인점(예: 스타벅스, 맥도날드 등)이고 지점을 언급했다면, 체인점 이름과 지점 정보를 모두 포함해 주세요. 예를 들어, "맥도날드 명지대점"은 "맥도날드 명지대점", "강남역 근처 스타벅스"는 "스타벅스 강남역점", "하남에 있는 스타필드"는 "스타필드 하남점"으로 응답해 주세요.
     5. 단어 중복 방지: 목적지 단어를 중복하지 말고, 정확하게 추출된 단어만 응답해 주세요. 중복된 단어는 제외해 주세요.
-    6. 응답 형식: 위의 작업을 완료한 후, 최종 목적지 단어만 명확하게 제공해 주세요. 예를 들어, "추출된 목적지: 봉대박 파스타"는 "봉대박 파스타"로 응답해 주세요.
+    6. 응답 형식: 최종 목적지 단어만 명확하게 제공해 주세요.
 
     원본 텍스트: {original_text}
 
-    보정된 목적지:
+    최종 목적지:
     """
 )
 
-# 텍스트 보정 체인
+# 목적지 체인
 correction_chain = correction_prompt | llm | StrOutputParser()
+
+# 지점 보정
+branch_prompt = PromptTemplate.from_template(
+    """
+    다음 텍스트 내부에는 목적지가 체인점인 경우 지점을 물어본 경우라, 지점에 관한 정보가 들어 있습니다.
+    이 텍스트에 다음 작업을 수행해 지점 출력을 완료해주세요.
+
+    1. 발음 교정: 발음이 어눌하거나, 맥락에 맞지 않게 센 발음이거나, 잘못된 부분이 있다면 올바르게 수정해 주세요.
+    2. 지점 추출: 지점에 해당하는 단어만 추출해 주세요. 
+       예를 들어, "하남에 있는 스타필드"는 "하남점"으로, "스타필드 하남점"은 "하남점"으로, "맥도날드 명지대점"은 "명지대점"으로 응답해 주세요.
+    3. 응답 형식: 최종 지점 정보만 명확하게 제공해 주세요. 예를 들어, "추출된 지점: 명지대점"은 "명지대점"으로 응답해 주세요.
+
+    원본 텍스트: {original_text}
+
+    보정된 지점:
+    """
+)
+
+# 지점 체인
+branch_chain = branch_prompt | llm | StrOutputParser()
 
 class TaxiChatBot:
     def __init__(self):
@@ -96,6 +116,10 @@ class TaxiChatBot:
         corrected = correction_chain.invoke({"original_text": text}).strip()
         return corrected
 
+    def correct_branch(self, text):
+        corrected = branch_chain.invoke({"original_text": text}).strip()
+        return corrected
+
     def process_message(self, message):
         if not self.destination:
             corrected_destination = self.correct_destination(message)
@@ -107,7 +131,8 @@ class TaxiChatBot:
             else:
                 response = f"{self.destination}(이)가 맞을까요?"
         elif self.asking_branch:
-            self.branch_info = message.strip()
+            corrected_branch = self.correct_branch(message)
+            self.branch_info = corrected_branch.strip()
             response = f"{self.destination} {self.branch_info}(이)가 맞을까요?"
             self.asking_branch = False
         elif not self.confirmed:
@@ -173,6 +198,7 @@ def handle_message(data):
         handle_disconnect()
     else:
         emit('response', {'message': reply})
+        print(reply)
 
 def convert_audio_to_text(audio_data):
     audio = speech.RecognitionAudio(content=audio_data)
@@ -187,3 +213,4 @@ def convert_audio_to_text(audio_data):
 if __name__ == '__main__':
     logging.info("Starting the server...")
     eventlet.wsgi.server(eventlet.listen(('0.0.0.0', 5000)), app)
+    # eventlet.wsgi.server(eventlet.listen(('0.0.0.0', 5001)), app)
