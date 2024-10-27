@@ -12,7 +12,7 @@
 <br>
 
 ## Role
-- **AI**: `Langchain`과 `OpenAI Api`를 이용한 대화형 목적지 설정 및 인상착의 이미지 묘사 AI 개발
+- **AI**: `Langchain`과 `OpenAI Api`를 활용한 대화형 목적지 설정 및 인상착의 이미지 묘사 AI 개발
 - **Infra**: AWS EC2/RDS/S3 구축 및 관리, HTTPS 설정
   
 <br>
