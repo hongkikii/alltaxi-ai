@@ -11,7 +11,7 @@
 <br>
 
 ## Role
-- `Langchain`과 `OpenAI Api`를 이용한 대화형 목적지 설정, 인상착의 묘사 AI 개발
+- `Langchain`과 `OpenAI Api`를 이용한 대화형 목적지 설정 및 인상착의 이미지 묘사 AI 개발
   
 <br>
 
