@@ -10,6 +10,11 @@
 
 <br>
 
+## Role
+- `Langchain`과 `OpenAI Api`를 이용한 대화형 목적지 설정 AI 개발
+
+<br>
+
 ## Introduce
 <img width="1511" alt="스크린샷 2024-10-27 오후 4 08 51" src="https://github.com/user-attachments/assets/c3f8f182-6c5f-4d33-9d1a-b9864bb45d1b">
 <img width="1511" alt="스크린샷 2024-10-27 오후 4 09 12" src="https://github.com/user-attachments/assets/670ee535-b979-4cf2-aa38-e8cba2118db9">
