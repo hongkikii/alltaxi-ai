@@ -7,6 +7,7 @@
 ## Stack
 ![Python](https://img.shields.io/badge/Python-3776AB?style=for-the-badge&logo=python&logoColor=white)
 ![Flask](https://img.shields.io/badge/Flask-000000?style=for-the-badge&logo=flask&logoColor=white)
+![AWS](https://img.shields.io/badge/Amazon_AWS-232F3E?style=for-the-badge&logo=amazon-aws&logoColor=white)
 
 <br>
 
@@ -19,6 +20,11 @@
 ## Introduce
 <img width="1511" alt="스크린샷 2024-10-27 오후 4 08 51" src="https://github.com/user-attachments/assets/c3f8f182-6c5f-4d33-9d1a-b9864bb45d1b">
 <img width="1511" alt="스크린샷 2024-10-27 오후 4 09 12" src="https://github.com/user-attachments/assets/670ee535-b979-4cf2-aa38-e8cba2118db9">
-<img width="1511" alt="스크린샷 2024-10-27 오후 4 09 14" src="https://github.com/user-attachments/assets/69c9f334-0c7d-4d74-a4e4-276be7d5fa3f">
-<img width="1511" alt="스크린샷 2024-10-27 오후 4 09 18" src="https://github.com/user-attachments/assets/402641d2-e119-40a7-baad-48b56edd7112">
-<img width="1511" alt="스크린샷 2024-10-27 오후 4 09 20" src="https://github.com/user-attachments/assets/ebc75de1-1e6c-4cad-b96d-81a630df9a30">
+<img width="1511" alt="스크린샷 2024-10-27 오후 4 45 22" src="https://github.com/user-attachments/assets/73cc58b8-f171-4a57-910a-e191d0e31460">
+<img width="1511" alt="스크린샷 2024-10-27 오후 4 45 30" src="https://github.com/user-attachments/assets/931bca67-2115-4c55-8b84-e8a9b4948945">
+<img width="1511" alt="스크린샷 2024-10-27 오후 4 45 37" src="https://github.com/user-attachments/assets/6d442e3f-b4d9-4d83-9572-42b77ea040a3">
+  
+<br>
+
+## Demo Link
+https://drive.google.com/file/d/13NO8-utPG4dGGldpDZCZg_t_8b0ttf0G/view?usp=sharing
